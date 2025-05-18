@@ -3,5 +3,5 @@ services:
   - type: web
     name: microblog
     env: python
-    buildCommand: "./build.sh"
+    buildCommand: ""
     startCommand: gunicorn -w 4 -b 0.0.0.0:10000 microblog:app
