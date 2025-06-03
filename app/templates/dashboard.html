@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { padding: 2rem; background-color: #f8f9fa; }
+    .dashboard-card {
+      border: none; border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.05);
+      transition: transform 0.2s ease;
+    }
+    .dashboard-card:hover { transform: translateY(-3px); }
+    .chart-container {
+      padding: 1rem;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.05);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="mb-4">📊 Dashboard</h1>
+
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card dashboard-card p-4">
+          <h5>Hello, <strong>{{ user.username }}</strong> 👋</h5>
+          <p>You have <strong>{{ post_count }}</strong> posts.</p>
+          {% if last_post %}
+            <p>Last post: <strong>{{ last_post }}</strong></p>
+          {% else %}
+            <p>No posts yet.</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card dashboard-card p-4">
+          <h5>👥 Followers</h5>
+          <p>You follow <strong>{{ following_count() }}</strong> users.</p>
+          <p>Followed by <strong>{{ followers_count() }}</strong> users.</p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="chart-container">
+          <h5>📈 Weekly Posts</h5>
+          <canvas id="postsChart" height="150"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="alert alert-info mt-4">
+      💌 You have <strong>{{ unread_messages }}</strong> unread messages.
+    </div>
+
+    <div class="mt-4">
+      ⏳ Session Active: <span id="session-time">0 seconds</span>
+    </div>
+
+    <div class="card dashboard-card p-3 mt-4">
+      <h5>📝 Recent Posts</h5>
+      <ul class="list-group list-group-flush">
+        {% for post in recent_posts %}
+        <li class="list-group-item">"{{ post.content }}" – {{ post.timestamp }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    const ctx = document.getElementById('postsChart').getContext('2d');
+    const postsChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        datasets: [{
+          label: 'Posts This Week',
+          data: [2, 4, 1, 3, 5, 2, 1],
+          backgroundColor: 'rgba(54, 162, 235, 0.5)',
+          borderColor: 'rgba(54, 162, 235, 1)',
+          borderWidth: 1,
+          borderRadius: 6,
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: { stepSize: 1 }
+          }
+        },
+        plugins: {
+          legend: { display: false }
+        }
+      }
+    });
+
+    const start = new Date();
+    setInterval(() => {
+      const now = new Date();
+      const diff = Math.floor((now - start) / 1000);
+      document.getElementById("session-time").innerText = diff + " seconds";
+    }, 1000);
+  </script>
+</body>
+</html>
