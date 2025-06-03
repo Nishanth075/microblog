@@ -239,3 +239,35 @@ def notifications():
         'data': n.get_data(),
         'timestamp': n.timestamp
     } for n in notifications]
+
+
+from app.models import User, Post
+from flask import render_template
+from flask_login import login_required, current_user
+from app.main import bp
+from app import db
+
+@bp.route('/dashboard')
+@login_required
+def dashboard():
+    user = current_user
+
+    post_count = db.session.query(Post).filter_by(user_id=user.id).count()
+    last_post = db.session.query(Post).filter_by(user_id=user.id).order_by(Post.timestamp.desc()).first()
+    recent_posts = db.session.query(Post).filter_by(user_id=user.id).order_by(Post.timestamp.desc()).limit(5).all()
+
+    # You may need to adjust these two depending on how you define the followers relationship
+    followers_count = getattr(user, "followers_count", 0)
+    following_count = getattr(user, "following_count", 0)
+    unread_messages = 5  # or query from a real model
+
+    return render_template(
+        'dashboard.html',
+        user=user,
+        post_count=post_count,
+        last_post=last_post.timestamp if last_post else None,
+        followers_count=followers_count,
+        following_count=following_count,
+        unread_messages=unread_messages,
+        recent_posts=recent_posts
+    )
